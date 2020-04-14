@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>  
+  <title>Async Await</title>
+<style>
+  pre{
+    font-size: x-small;
+  }
+</style>  
+</head>
+<body>
+  <div class="container flow-text">
+    <div class="row">
+      <div class="col s12 text-align-center">
+        <h1>Async Await</h1>
+
+<small>
+  <p>
+<pre>
+const axios = require('axios');
+
+// 1st function - getExchangeRate
+const getExchangeRate = async (fromCurrency, toCurrency) => {
+  const response = await axios.get('http://data.fixer.io/api/latest?access_key=2c88b65cd00862df2da94ae527cd8282');
+  const rate = response.data.rates;
+  const euro = 1 / rate[fromCurrency];
+  const exchangeRate = euro * rate[toCurrency];
+
+  if (isNaN(exchangeRate)) {
+    throw new Error (`Unable to get currency ${fromCurrency} and ${toCurrency}`)
+  }
+
+  return exchangeRate;
+  }  
+</pre>
+  </p>
+</small>
+<div class="divider"></div>
+<small>
+  <p>
+<pre>
+// 2nd function - getCountries
+const getCountries = async (toCurrency) => {
+  try {
+    const response = await axios.get(`https://restcountries.eu/rest/v2/currency/${toCurrency}`)
+    return response.data.map(country => country.name);
+  } catch (error) {
+    throw new Error(`Unable to get countries that use
+    ${toCurrency}`)
+  }
+  
+}
+</pre>    
+  </p>
+</small>
+<div class="divider"></div>
+<small>
+  <p>
+<pre>
+// 3rd function - convertCurrency
+const convertCurrency = async (fromCurrency, toCurrency, amount) => {
+  const countries = await getCountries(toCurrency);
+  const exchangeRate = await getExchangeRate(fromCurrency, toCurrency);
+  const convertedAmount = (amount * exchangeRate).toFixed(2);
+  
+  return `${amount} ${fromCurrency} is worth ${convertedAmount} ${toCurrency}. You can spent these in the 
+  following countries: ${countries}`
+}
+</pre>
+  </p>
+</small>
+<div class="divider"></div>
+<small>
+  <p>
+<pre>
+// Call convert currency to get meaninful data
+convertCurrency('EUR', 'COP', 70)
+  .then((message) => {
+    console.log(message);
+  }).catch((error) => {
+    console.log(error.message);
+  });
+</pre>    
+  </p>
+</small>
+      </div>
+    </div>
+  </div>
+
+  <script src="currency-converter.js"></script>
+</body>
+</html>
